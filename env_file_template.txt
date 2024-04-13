@@ -1,0 +1,7 @@
+api_key=
+project_id=
+# Use https://us-south.ml.cloud.ibm.com for US
+# Use https://jp-tok.ml.cloud.ibm.com for Japan
+url=
+# use jp for Japan and us for US
+locale=
