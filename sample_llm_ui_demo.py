@@ -12,7 +12,6 @@ This example shows a simple use cases without comprehensive prompt tuning.
 
 # For reading credentials from the .env file
 import os
-from dotenv import load_dotenv
 
 import streamlit as st
 import pandas as pd
@@ -64,13 +63,11 @@ selected_use_case_model = ""
 
 def get_credentials():
 
-    load_dotenv()
-
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.getenv("api_key", None)
-    globals()["watsonx_project_id"] = os.getenv("project_id", None)
-    globals()["url"] = os.getenv("url", None)
-    globals()["locale"] = os.getenv("locale", None)
+    globals()["api_key"] = os.environ["api_key"]
+    globals()["watsonx_project_id"] = os.environ["project_id"]
+    globals()["url"] = os.environ["url"]
+    globals()["locale"] = os.environ["locale"]
 
 def demo_summary():
 
