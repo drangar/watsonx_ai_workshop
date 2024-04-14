@@ -13,7 +13,6 @@ This example shows several examples of inference with LLMs
 
 # For reading credentials from the .env file
 import os
-from dotenv import load_dotenv
 
 from ibm_watson_machine_learning.foundation_models import Model
 from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
@@ -30,12 +29,10 @@ url = ""
 
 def get_credentials():
 
-    load_dotenv()
-
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.getenv("api_key", None)
-    globals()["watsonx_project_id"] = os.getenv("project_id", None)
-    globals()["url"] = os.getenv("url", None)
+    globals()["api_key"] = os.environ["api_key"]
+    globals()["watsonx_project_id"] = os.environ["project_id"]
+    globals()["url"] = os.environ["url"]
 
 # This function creates a model object with the specified parameters
 def get_model(model_type,max_tokens,min_tokens,decoding,temperature,repetition_penalty):
