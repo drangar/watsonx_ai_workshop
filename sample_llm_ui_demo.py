@@ -233,6 +233,7 @@ def main():
         demo_analyze()
 
 
+print("Anish: " + os.environ["api_key"])
 
 if __name__ == "__main__":
     main()
