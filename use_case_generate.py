@@ -13,6 +13,7 @@ This example shows a Generate use case
 
 # For reading credentials from the .env file
 import os
+from dotenv import load_dotenv
 
 from ibm_watson_machine_learning.foundation_models import Model
 from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
@@ -28,10 +29,12 @@ url = ""
 
 def get_credentials():
 
+    load_dotenv()
+
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.environ["api_key"]
-    globals()["watsonx_project_id"] = os.environ["project_id"]
-    globals()["url"] = os.environ["url"]
+    globals()["api_key"] = os.getenv("api_key", None)
+    globals()["watsonx_project_id"] = os.getenv("project_id", None)
+    globals()["url"] = os.getenv("url", None)
 
 def get_model(model_type,max_tokens,min_tokens,decoding,temperature):
 
@@ -112,6 +115,37 @@ def get_prompt(service_review, task_type, sentiment):
 
     return complete_prompt
 
+def main():
+
+    # Specify model parameters
+    model_type = ModelTypes.LLAMA_2_70B_CHAT
+    max_tokens = 150
+    min_tokens = 100
+    decoding = DecodingMethods.SAMPLE
+    temperature = 0.7
+
+    # Get the API key and project id and update global variables
+    get_credentials()
+
+    # Instantiate the model
+    model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
+
+    review = get_review()
+    complete_prompt = get_prompt(review, TASK_GENERATE_EMAIL, "negative")
+
+    generated_response = model.generate(prompt=complete_prompt)
+    response_text = generated_response['results'][0]['generated_text']
+
+    # print model response
+    print("--------------------------------- Generated email for a negative review -----------------------------------")
+    print("Prompt: " + complete_prompt.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Generated email: " + response_text)
+    print("*********************************************************************************************")
+
+    # Test invocation of a function from the external moduel
+    generate(api_key,watsonx_project_id,review,TASK_GENERATE_EMAIL,model_type)
+
 def generate(request_api_key, request_project_id, review, task,model_type):
 
     # Retrieve variables for invoking llms
@@ -139,33 +173,6 @@ def generate(request_api_key, request_project_id, review, task,model_type):
     print("Function invocation test result:" + response_text)
 
 
-
-# Specify model parameters
-model_type = ModelTypes.LLAMA_2_70B_CHAT
-max_tokens = 150
-min_tokens = 100
-decoding = DecodingMethods.SAMPLE
-temperature = 0.7
-
-# Get the API key and project id and update global variables
-get_credentials()
-
-# Instantiate the model
-model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
-
-review = get_review()
-complete_prompt = get_prompt(review, TASK_GENERATE_EMAIL, "negative")
-
-generated_response = model.generate(prompt=complete_prompt)
-response_text = generated_response['results'][0]['generated_text']
-
-# print model response
-print("--------------------------------- Generated email for a negative review -----------------------------------")
-print("Prompt: " + complete_prompt.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Generated email: " + response_text)
-print("*********************************************************************************************")
-
-# Test invocation of a function from the external moduel
-generate(api_key,watsonx_project_id,review,TASK_GENERATE_EMAIL,model_type)
-
+# Invoke the main function
+if __name__ == "__main__":
+    main()

@@ -12,12 +12,14 @@ This example shows a simple use cases without comprehensive prompt tuning.
 
 # For reading credentials from the .env file
 import os
+from dotenv import load_dotenv
 
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import datetime
 import re
+import random
 
 # Modules for invoking LLMs
 # We assume that the modules are in the same folder as the streamlit app
@@ -63,11 +65,13 @@ selected_use_case_model = ""
 
 def get_credentials():
 
+    load_dotenv()
+
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.environ["api_key"]
-    globals()["watsonx_project_id"] = os.environ["project_id"]
-    globals()["url"] = os.environ["url"]
-    globals()["locale"] = os.environ["locale"]
+    globals()["api_key"] = os.getenv("api_key", None)
+    globals()["watsonx_project_id"] = os.getenv("project_id", None)
+    globals()["url"] = os.getenv("url", None)
+    globals()["locale"] = os.getenv("locale", None)
 
 def demo_summary():
 
@@ -83,7 +87,7 @@ def demo_summary():
         st.header = "Review"
         # Add a dropdown for selecting the review type
         options = [REVIEW_TYPE_DEFAULT, REVIEW_TYPE_NEGATIVE, REVIEW_TYPE_POSITIVE, REVIEW_TYPE_KEYWORD_INTEREST, REVIEW_TYPE_BULLET_POINTS]
-        selected_option = st.selectbox("Review type:", options)
+        selected_option = st.selectbox("Review type:", options, key="sel"+str(random.randint(1, 100)))
         st.image(image_url, use_column_width=True)
 
         default_review_orig = f"""I started my loan process toward securing a VA loan. I was waiting for a a month
@@ -111,7 +115,7 @@ def demo_summary():
 
     with col2:
         review = st.text_area('Review',value=default_review, height=300)
-        get_summary_clicked = st.button("Summarize")
+        get_summary_clicked = st.button("Summarize", key="but"+str(random.randint(1222, 9900)))
 
     st.subheader("Results")
 
@@ -134,7 +138,7 @@ def demo_extract():
         st.header = "Extract"
         # Add a select box
         options = [TASK_ENTITY, TASK_EMOTIONS, TASK_SENTIMENT]
-        selected_option = st.selectbox("Select an option:", options)
+        selected_option = st.selectbox("Select an option:", options, key="sel"+str(random.randint(101, 990)))
         st.image(image_url, use_column_width=True)
 
         default_review_orig = f"""We used the Hilton Waikoloa's pool and slide while vacationing at 
@@ -154,7 +158,7 @@ def demo_extract():
 
     with col2:
         review = st.text_area('Review',value=default_review, height=300)
-        extract_info_clicked = st.button("Extract")
+        extract_info_clicked = st.button("Extract", key="but"+str(random.randint(1, 10000))))
 
     st.subheader("Results")
 
@@ -175,7 +179,7 @@ def demo_analyze():
 
     st.header = "Data Visualization"
 
-    update_analysis = st.button("Run analysis")
+    update_analysis = st.button("Run analysis", key="but"+str(random.randint(1203, 10000))))
 
     df = pd.DataFrame(get_notes_data())
 
@@ -192,44 +196,47 @@ def demo_analyze():
     fig = px.bar(df, x="Category", color="Category", barmode="group")
     st.plotly_chart(fig)
 
+def main():
 
-# Get the API key and project id and update global variables
-get_credentials()
+    # Get the API key and project id and update global variables
+    get_credentials()
 
-# Use the full page instead of a narrow central column
-st.set_page_config(layout="wide")
+    # Use the full page instead of a narrow central column
+    st.set_page_config(layout="wide")
 
-# Sidebar
-st.sidebar.title("LLM Use Cases")
+    # Sidebar
+    st.sidebar.title("LLM Use Cases")
 
-# Show models specific to locale specified in .env
-if locale == "jp":
-    selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_ELYZA,DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
-else:
-    selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
-
-
-if selected_model == DISPLAY_MODEL_LLAMA:
-    globals()["selected_use_case_model"] = LLAMA_2_70B_CHAT
-elif selected_model == DISPLAY_MODEL_GRANITE:
-    globals()["selected_use_case_model"] = GRANITE_13B_CHAT
-elif selected_model == DISPLAY_MODEL_ELYZA:
-    globals()["selected_use_case_model"] = ELYZA
-else:
-    # Default model if there is no selection
-    globals()["selected_use_case_model"] = FLAN_UL2
-
-# For debugging
-print("Selected model: " + selected_use_case_model)
-
-selected_option = st.sidebar.selectbox("Select Option", [OPTION_SUMMARY,OPTION_EXTRACT,OPTION_ANALYZE])
-demo_summary()
-if selected_option == OPTION_SUMMARY:
-    demo_summary()
-elif selected_option == OPTION_EXTRACT:
-    demo_extract()
-elif selected_option == OPTION_ANALYZE:
-    demo_analyze()
+    # Show models specific to locale specified in .env
+    if locale == "jp":
+        selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_ELYZA,DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
+    else:
+        selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
 
 
+    if selected_model == DISPLAY_MODEL_LLAMA:
+        globals()["selected_use_case_model"] = LLAMA_2_70B_CHAT
+    elif selected_model == DISPLAY_MODEL_GRANITE:
+        globals()["selected_use_case_model"] = GRANITE_13B_CHAT
+    elif selected_model == DISPLAY_MODEL_ELYZA:
+        globals()["selected_use_case_model"] = ELYZA
+    else:
+        # Default model if there is no selection
+        globals()["selected_use_case_model"] = FLAN_UL2
 
+    # For debugging
+    print("Selected model: " + selected_use_case_model)
+
+    selected_option = st.sidebar.selectbox("Select Option", [OPTION_SUMMARY,OPTION_EXTRACT,OPTION_ANALYZE])
+
+    if selected_option == OPTION_SUMMARY:
+        demo_summary()
+    elif selected_option == OPTION_EXTRACT:
+        demo_extract()
+    elif selected_option == OPTION_ANALYZE:
+        demo_analyze()
+
+
+
+if __name__ == "__main__":
+    main()

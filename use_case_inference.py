@@ -13,6 +13,7 @@ This example shows several examples of inference with LLMs
 
 # For reading credentials from the .env file
 import os
+from dotenv import load_dotenv
 
 from ibm_watson_machine_learning.foundation_models import Model
 from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
@@ -29,10 +30,12 @@ url = ""
 
 def get_credentials():
 
+    load_dotenv()
+
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.environ["api_key"]
-    globals()["watsonx_project_id"] = os.environ["project_id"]
-    globals()["url"] = os.environ["url"]
+    globals()["api_key"] = os.getenv("api_key", None)
+    globals()["watsonx_project_id"] = os.getenv("project_id", None)
+    globals()["url"] = os.getenv("url", None)
 
 # This function creates a model object with the specified parameters
 def get_model(model_type,max_tokens,min_tokens,decoding,temperature,repetition_penalty):
@@ -122,6 +125,64 @@ def get_prompt(service_review, task_type):
 
     return complete_prompt
 
+def main():
+
+    # Specify model parameters
+    model_type = ModelTypes.FLAN_UL2
+    max_tokens = 70
+    min_tokens = 30
+    decoding = DecodingMethods.GREEDY
+    temperature = 0.7
+    # Max repition penalty, 1 is min
+    repetition_penalty = 2
+
+    # Get the API key and project id and update global variables
+    get_credentials()
+
+    # Instantiate the model
+    model = get_model(model_type, max_tokens, min_tokens, decoding, temperature,repetition_penalty)
+
+    # Get sample review
+    review = get_review()
+
+    # Construct prompts
+    complete_prompt1 = get_prompt(review, TASK_SENTIMENT)
+    complete_prompt2 = get_prompt(review, TASK_EMOTIONS)
+    complete_prompt3 = get_prompt(review, TASK_ENTITY)
+
+    # Invoke the model
+    generated_response = model.generate(prompt=complete_prompt1)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Sentiment -----------------------------------")
+    print("Prompt: " + complete_prompt1.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Review sentiment: " + response_text)
+    print("*********************************************************************************************")
+
+    # Emotions
+    generated_response = model.generate(prompt=complete_prompt2)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Emotions -----------------------------------")
+    print("Prompt: " + complete_prompt2.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Emotions: " + response_text)
+    print("*********************************************************************************************")
+
+    # Entity
+    generated_response = model.generate(prompt=complete_prompt3)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Entities -----------------------------------")
+    print("Prompt: " + complete_prompt3.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Entities Summary: " + response_text)
+    print("*********************************************************************************************")
+
+    # Test the function that will be invoked from the module
+    # Test modular function invocation
+    extract(api_key, watsonx_project_id, review, TASK_ENTITY,model_type)
 
 # Function that can be invoked from external modules
 def extract(request_api_key, request_project_id, review, task_type,model_type):
@@ -153,61 +214,6 @@ def extract(request_api_key, request_project_id, review, task_type,model_type):
 
     return response_text
 
-
-# Specify model parameters
-model_type = ModelTypes.FLAN_UL2
-max_tokens = 70
-min_tokens = 30
-decoding = DecodingMethods.GREEDY
-temperature = 0.7
-# Max repition penalty, 1 is min
-repetition_penalty = 2
-
-# Get the API key and project id and update global variables
-get_credentials()
-
-# Instantiate the model
-model = get_model(model_type, max_tokens, min_tokens, decoding, temperature,repetition_penalty)
-
-# Get sample review
-review = get_review()
-
-# Construct prompts
-complete_prompt1 = get_prompt(review, TASK_SENTIMENT)
-complete_prompt2 = get_prompt(review, TASK_EMOTIONS)
-complete_prompt3 = get_prompt(review, TASK_ENTITY)
-
-# Invoke the model
-generated_response = model.generate(prompt=complete_prompt1)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Sentiment -----------------------------------")
-print("Prompt: " + complete_prompt1.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Review sentiment: " + response_text)
-print("*********************************************************************************************")
-
-# Emotions
-generated_response = model.generate(prompt=complete_prompt2)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Emotions -----------------------------------")
-print("Prompt: " + complete_prompt2.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Emotions: " + response_text)
-print("*********************************************************************************************")
-
-# Entity
-generated_response = model.generate(prompt=complete_prompt3)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Entities -----------------------------------")
-print("Prompt: " + complete_prompt3.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Entities Summary: " + response_text)
-print("*********************************************************************************************")
-
-# Test the function that will be invoked from the module
-# Test modular function invocation
-extract(api_key, watsonx_project_id, review, TASK_ENTITY,model_type)
-
+# Invoke the main function
+if __name__ == "__main__":
+    main()

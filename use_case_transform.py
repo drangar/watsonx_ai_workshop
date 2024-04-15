@@ -13,6 +13,7 @@ This example shows a Transform use case
 
 # For reading credentials from the .env file
 import os
+from dotenv import load_dotenv
 
 from ibm_watson_machine_learning.foundation_models import Model
 from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenParams
@@ -30,10 +31,12 @@ url = ""
 
 def get_credentials():
 
+    load_dotenv()
+
     # Update the global variables that will be used for authentication in another function
-    globals()["api_key"] = os.environ["api_key"]
-    globals()["watsonx_project_id"] = os.environ["project_id"]
-    globals()["url"] = os.environ["url"]
+    globals()["api_key"] = os.getenv("api_key", None)
+    globals()["watsonx_project_id"] = os.getenv("project_id", None)
+    globals()["url"] = os.getenv("url", None)
 
 def get_model(model_type,max_tokens,min_tokens,decoding,temperature):
 
@@ -138,6 +141,75 @@ def get_prompt(sample_text, task_type):
 
     return complete_prompt
 
+def main():
+
+    # Specify model parameters
+    model_type = ModelTypes.GRANITE_13B_INSTRUCT_V2
+    max_tokens = 300
+    min_tokens = 30
+    decoding = DecodingMethods.GREEDY
+    temperature = 0.5
+
+    # Get the API key and project id and update global variables
+    get_credentials()
+
+    # Instantiate the model
+    model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
+
+    sample_text1 = get_sample_text(TASK_BULLET_POINTS)
+    sample_text2 = get_sample_text(TASK_HTML_FORMAT)
+    sample_text3 = get_sample_text(TASK_EXTRACT_EMAIL)
+    sample_text4 = get_sample_text(TASK_COMPLEX_JSON_FORMAT)
+
+    complete_prompt1 = get_prompt(sample_text1, TASK_BULLET_POINTS)
+    complete_prompt2 = get_prompt(sample_text2, TASK_HTML_FORMAT)
+    complete_prompt3 = get_prompt(sample_text3, TASK_EXTRACT_EMAIL)
+    # For the JSON format, the sample text includes the prompt
+    complete_prompt4 = sample_text4
+
+    generated_response = model.generate(prompt=complete_prompt1)
+    response_text = generated_response['results'][0]['generated_text']
+
+    # print model response
+    print("--------------------------------- Bullet points from text -----------------------------------")
+    print("Prompt: " + complete_prompt1.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Bullet points from text: " + response_text)
+    print("*********************************************************************************************")
+
+    # HTMl format
+    generated_response = model.generate(prompt=complete_prompt2)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Transformed Format: HTML -----------------------------------")
+    print("Prompt: " + complete_prompt2.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Transformed format: " + response_text)
+    print("*********************************************************************************************")
+
+    # HTMl format
+    generated_response = model.generate(prompt=complete_prompt3)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Transformed Format: EMAIL -----------------------------------")
+    print("Prompt: " + complete_prompt3.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Transformed format: " + response_text)
+    print("*********************************************************************************************")
+
+    # JSON format
+    generated_response = model.generate(prompt=complete_prompt4)
+    response_text = generated_response['results'][0]['generated_text']
+    # print model response
+    print("--------------------------------- Transformed Format: JSON -----------------------------------")
+    print("Prompt: " + complete_prompt4.strip())
+    print("---------------------------------------------------------------------------------------------")
+    print("Transformed format: " + response_text)
+    print("*********************************************************************************************")
+
+    # Test invocation of a function that will be called from an external module
+    transform(api_key,watsonx_project_id,sample_text1,TASK_BULLET_POINTS,model_type)
+
 def transform(request_api_key, request_project_id, sample_text,task,model_type):
 
     # Retrieve variables for invoking llms
@@ -166,70 +238,7 @@ def transform(request_api_key, request_project_id, sample_text,task,model_type):
 
     return response_text
 
-# Specify model parameters
-model_type = ModelTypes.GRANITE_13B_INSTRUCT_V2
-max_tokens = 300
-min_tokens = 30
-decoding = DecodingMethods.GREEDY
-temperature = 0.5
-
-# Get the API key and project id and update global variables
-get_credentials()
-
-# Instantiate the model
-model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
-
-sample_text1 = get_sample_text(TASK_BULLET_POINTS)
-sample_text2 = get_sample_text(TASK_HTML_FORMAT)
-sample_text3 = get_sample_text(TASK_EXTRACT_EMAIL)
-sample_text4 = get_sample_text(TASK_COMPLEX_JSON_FORMAT)
-
-complete_prompt1 = get_prompt(sample_text1, TASK_BULLET_POINTS)
-complete_prompt2 = get_prompt(sample_text2, TASK_HTML_FORMAT)
-complete_prompt3 = get_prompt(sample_text3, TASK_EXTRACT_EMAIL)
-# For the JSON format, the sample text includes the prompt
-complete_prompt4 = sample_text4
-
-generated_response = model.generate(prompt=complete_prompt1)
-response_text = generated_response['results'][0]['generated_text']
-
-# print model response
-print("--------------------------------- Bullet points from text -----------------------------------")
-print("Prompt: " + complete_prompt1.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Bullet points from text: " + response_text)
-print("*********************************************************************************************")
-
-# HTMl format
-generated_response = model.generate(prompt=complete_prompt2)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Transformed Format: HTML -----------------------------------")
-print("Prompt: " + complete_prompt2.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Transformed format: " + response_text)
-print("*********************************************************************************************")
-
-# HTMl format
-generated_response = model.generate(prompt=complete_prompt3)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Transformed Format: EMAIL -----------------------------------")
-print("Prompt: " + complete_prompt3.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Transformed format: " + response_text)
-print("*********************************************************************************************")
-
-# JSON format
-generated_response = model.generate(prompt=complete_prompt4)
-response_text = generated_response['results'][0]['generated_text']
-# print model response
-print("--------------------------------- Transformed Format: JSON -----------------------------------")
-print("Prompt: " + complete_prompt4.strip())
-print("---------------------------------------------------------------------------------------------")
-print("Transformed format: " + response_text)
-print("*********************************************************************************************")
-
-# Test invocation of a function that will be called from an external module
-transform(api_key,watsonx_project_id,sample_text1,TASK_BULLET_POINTS,model_type)
+# Invoke the main function
+if __name__ == "__main__":
+    main()
 
