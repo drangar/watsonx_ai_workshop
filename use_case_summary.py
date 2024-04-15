@@ -35,7 +35,7 @@ def get_credentials():
     globals()["api_key"] = os.environ["api_key"]
     globals()["watsonx_project_id"] = os.environ["project_id"]
     globals()["url"] = os.environ["url"]
-    
+
 # This function creates a model object with the specified parameters
 def get_model(model_type,max_tokens,min_tokens,decoding,temperature):
 
@@ -185,80 +185,6 @@ def get_few_shot_prompt_from_file(review, fileName):
 
     return complete_prompt
 
-def main():
-
-    # Get the review that we will summarize
-    review = get_review()
-
-    # Create prompts for different types of summary
-    complete_prompt1 = get_prompt(review, REVIEW_TYPE_DEFAULT)
-    complete_prompt2 = get_prompt(review, REVIEW_TYPE_NEGATIVE)
-    complete_prompt3 = get_prompt(review, REVIEW_TYPE_POSITIVE)
-    complete_prompt4 = get_prompt(review, REVIEW_TYPE_KEYWORD_INTEREST)
-    complete_prompt5 = get_prompt(review, REVIEW_TYPE_BULLET_POINTS)
-
-    # Specify model parameters
-    model_type = ModelTypes.FLAN_UL2
-    max_tokens = 300
-    min_tokens = 50
-    decoding = DecodingMethods.SAMPLE
-    temperature = 0.7
-
-    # Get the API key and project id and update global variables
-    get_credentials()
-
-    # Instantiate the model
-    model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
-
-    # Default summary
-    # Invoke the model and print the results
-    generated_response = model.generate(prompt=complete_prompt1)
-    # print model response
-    print("--------------------------------- Default Review Summary -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Default Summary: " + generated_response['results'][0]['generated_text'])
-    print("*********************************************************************************************")
-
-    # Negative summary
-    # Invoke the model and print the results
-    generated_response = model.generate(prompt=complete_prompt2)
-    # print model response
-    print("--------------------------------- Negative Review Summary -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Negative Summary: " + generated_response['results'][0]['generated_text'])
-
-    # Positive summary
-    # Invoke the model and print the results
-    generated_response = model.generate(prompt=complete_prompt3)
-    # print model response
-    print("--------------------------------- Positive Review Summary -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Positive Summary: " + generated_response['results'][0]['generated_text'])
-
-    # Keyword summary
-    # Invoke the model and print the results
-    generated_response = model.generate(prompt=complete_prompt4)
-    # print model response
-    print("--------------------------------- Keyword  Summary -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Keyword Summary: " + generated_response['results'][0]['generated_text'])
-
-    # Bullet points summary
-    # Invoke the model and print the results
-    generated_response = model.generate(prompt=complete_prompt5)
-    # print model response
-    print("--------------------------------- Bullet Points Summary -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Bullet Points Summary: " + generated_response['results'][0]['generated_text'])
-
-    # Test modular function invocation
-    get_summary(api_key, watsonx_project_id, review,REVIEW_TYPE_DEFAULT,model_type)
-
 # This function is called when this script is imported as a module
 def get_summary(request_api_key, request_project_id, review,review_type,model_type):
 
@@ -289,6 +215,75 @@ def get_summary(request_api_key, request_project_id, review,review_type,model_ty
 
     return response_text
 
-# Invoke the main function
-if __name__ == "__main__":
-    main()
+
+# Get the review that we will summarize
+review = get_review()
+
+# Create prompts for different types of summary
+complete_prompt1 = get_prompt(review, REVIEW_TYPE_DEFAULT)
+complete_prompt2 = get_prompt(review, REVIEW_TYPE_NEGATIVE)
+complete_prompt3 = get_prompt(review, REVIEW_TYPE_POSITIVE)
+complete_prompt4 = get_prompt(review, REVIEW_TYPE_KEYWORD_INTEREST)
+complete_prompt5 = get_prompt(review, REVIEW_TYPE_BULLET_POINTS)
+
+# Specify model parameters
+model_type = ModelTypes.FLAN_UL2
+max_tokens = 300
+min_tokens = 50
+decoding = DecodingMethods.SAMPLE
+temperature = 0.7
+
+# Get the API key and project id and update global variables
+get_credentials()
+
+# Instantiate the model
+model = get_model(model_type, max_tokens, min_tokens, decoding, temperature)
+
+# Default summary
+# Invoke the model and print the results
+generated_response = model.generate(prompt=complete_prompt1)
+# print model response
+print("--------------------------------- Default Review Summary -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Default Summary: " + generated_response['results'][0]['generated_text'])
+print("*********************************************************************************************")
+
+# Negative summary
+# Invoke the model and print the results
+generated_response = model.generate(prompt=complete_prompt2)
+# print model response
+print("--------------------------------- Negative Review Summary -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Negative Summary: " + generated_response['results'][0]['generated_text'])
+
+# Positive summary
+# Invoke the model and print the results
+generated_response = model.generate(prompt=complete_prompt3)
+# print model response
+print("--------------------------------- Positive Review Summary -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Positive Summary: " + generated_response['results'][0]['generated_text'])
+
+# Keyword summary
+# Invoke the model and print the results
+generated_response = model.generate(prompt=complete_prompt4)
+# print model response
+print("--------------------------------- Keyword  Summary -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Keyword Summary: " + generated_response['results'][0]['generated_text'])
+
+# Bullet points summary
+# Invoke the model and print the results
+generated_response = model.generate(prompt=complete_prompt5)
+# print model response
+print("--------------------------------- Bullet Points Summary -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Bullet Points Summary: " + generated_response['results'][0]['generated_text'])
+
+# Test modular function invocation
+get_summary(api_key, watsonx_project_id, review,REVIEW_TYPE_DEFAULT,model_type)

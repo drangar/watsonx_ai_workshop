@@ -122,64 +122,6 @@ def get_prompt(service_review, task_type):
 
     return complete_prompt
 
-def main():
-
-    # Specify model parameters
-    model_type = ModelTypes.FLAN_UL2
-    max_tokens = 70
-    min_tokens = 30
-    decoding = DecodingMethods.GREEDY
-    temperature = 0.7
-    # Max repition penalty, 1 is min
-    repetition_penalty = 2
-
-    # Get the API key and project id and update global variables
-    get_credentials()
-
-    # Instantiate the model
-    model = get_model(model_type, max_tokens, min_tokens, decoding, temperature,repetition_penalty)
-
-    # Get sample review
-    review = get_review()
-
-    # Construct prompts
-    complete_prompt1 = get_prompt(review, TASK_SENTIMENT)
-    complete_prompt2 = get_prompt(review, TASK_EMOTIONS)
-    complete_prompt3 = get_prompt(review, TASK_ENTITY)
-
-    # Invoke the model
-    generated_response = model.generate(prompt=complete_prompt1)
-    response_text = generated_response['results'][0]['generated_text']
-    # print model response
-    print("--------------------------------- Sentiment -----------------------------------")
-    print("Prompt: " + complete_prompt1.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Review sentiment: " + response_text)
-    print("*********************************************************************************************")
-
-    # Emotions
-    generated_response = model.generate(prompt=complete_prompt2)
-    response_text = generated_response['results'][0]['generated_text']
-    # print model response
-    print("--------------------------------- Emotions -----------------------------------")
-    print("Prompt: " + complete_prompt2.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Emotions: " + response_text)
-    print("*********************************************************************************************")
-
-    # Entity
-    generated_response = model.generate(prompt=complete_prompt3)
-    response_text = generated_response['results'][0]['generated_text']
-    # print model response
-    print("--------------------------------- Entities -----------------------------------")
-    print("Prompt: " + complete_prompt3.strip())
-    print("---------------------------------------------------------------------------------------------")
-    print("Entities Summary: " + response_text)
-    print("*********************************************************************************************")
-
-    # Test the function that will be invoked from the module
-    # Test modular function invocation
-    extract(api_key, watsonx_project_id, review, TASK_ENTITY,model_type)
 
 # Function that can be invoked from external modules
 def extract(request_api_key, request_project_id, review, task_type,model_type):
@@ -211,6 +153,61 @@ def extract(request_api_key, request_project_id, review, task_type,model_type):
 
     return response_text
 
-# Invoke the main function
-if __name__ == "__main__":
-    main()
+
+# Specify model parameters
+model_type = ModelTypes.FLAN_UL2
+max_tokens = 70
+min_tokens = 30
+decoding = DecodingMethods.GREEDY
+temperature = 0.7
+# Max repition penalty, 1 is min
+repetition_penalty = 2
+
+# Get the API key and project id and update global variables
+get_credentials()
+
+# Instantiate the model
+model = get_model(model_type, max_tokens, min_tokens, decoding, temperature,repetition_penalty)
+
+# Get sample review
+review = get_review()
+
+# Construct prompts
+complete_prompt1 = get_prompt(review, TASK_SENTIMENT)
+complete_prompt2 = get_prompt(review, TASK_EMOTIONS)
+complete_prompt3 = get_prompt(review, TASK_ENTITY)
+
+# Invoke the model
+generated_response = model.generate(prompt=complete_prompt1)
+response_text = generated_response['results'][0]['generated_text']
+# print model response
+print("--------------------------------- Sentiment -----------------------------------")
+print("Prompt: " + complete_prompt1.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Review sentiment: " + response_text)
+print("*********************************************************************************************")
+
+# Emotions
+generated_response = model.generate(prompt=complete_prompt2)
+response_text = generated_response['results'][0]['generated_text']
+# print model response
+print("--------------------------------- Emotions -----------------------------------")
+print("Prompt: " + complete_prompt2.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Emotions: " + response_text)
+print("*********************************************************************************************")
+
+# Entity
+generated_response = model.generate(prompt=complete_prompt3)
+response_text = generated_response['results'][0]['generated_text']
+# print model response
+print("--------------------------------- Entities -----------------------------------")
+print("Prompt: " + complete_prompt3.strip())
+print("---------------------------------------------------------------------------------------------")
+print("Entities Summary: " + response_text)
+print("*********************************************************************************************")
+
+# Test the function that will be invoked from the module
+# Test modular function invocation
+extract(api_key, watsonx_project_id, review, TASK_ENTITY,model_type)
+
