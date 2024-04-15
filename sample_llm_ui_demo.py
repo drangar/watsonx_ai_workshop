@@ -223,7 +223,7 @@ else:
 print("Selected model: " + selected_use_case_model)
 
 selected_option = st.sidebar.selectbox("Select Option", [OPTION_SUMMARY,OPTION_EXTRACT,OPTION_ANALYZE])
-
+demo_summary()
 if selected_option == OPTION_SUMMARY:
     demo_summary()
 elif selected_option == OPTION_EXTRACT:
