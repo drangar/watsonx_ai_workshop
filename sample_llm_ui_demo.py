@@ -192,48 +192,44 @@ def demo_analyze():
     fig = px.bar(df, x="Category", color="Category", barmode="group")
     st.plotly_chart(fig)
 
-def main():
 
-    # Get the API key and project id and update global variables
-    get_credentials()
+# Get the API key and project id and update global variables
+get_credentials()
 
-    # Use the full page instead of a narrow central column
-    st.set_page_config(layout="wide")
+# Use the full page instead of a narrow central column
+st.set_page_config(layout="wide")
 
-    # Sidebar
-    st.sidebar.title("LLM Use Cases")
+# Sidebar
+st.sidebar.title("LLM Use Cases")
 
-    # Show models specific to locale specified in .env
-    if locale == "jp":
-        selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_ELYZA,DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
-    else:
-        selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
-
-
-    if selected_model == DISPLAY_MODEL_LLAMA:
-        globals()["selected_use_case_model"] = LLAMA_2_70B_CHAT
-    elif selected_model == DISPLAY_MODEL_GRANITE:
-        globals()["selected_use_case_model"] = GRANITE_13B_CHAT
-    elif selected_model == DISPLAY_MODEL_ELYZA:
-        globals()["selected_use_case_model"] = ELYZA
-    else:
-        # Default model if there is no selection
-        globals()["selected_use_case_model"] = FLAN_UL2
-
-    # For debugging
-    print("Selected model: " + selected_use_case_model)
-
-    selected_option = st.sidebar.selectbox("Select Option", [OPTION_SUMMARY,OPTION_EXTRACT,OPTION_ANALYZE])
-
-    if selected_option == OPTION_SUMMARY:
-        demo_summary()
-    elif selected_option == OPTION_EXTRACT:
-        demo_extract()
-    elif selected_option == OPTION_ANALYZE:
-        demo_analyze()
+# Show models specific to locale specified in .env
+if locale == "jp":
+    selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_ELYZA,DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
+else:
+    selected_model = st.sidebar.selectbox("Select model",[DISPLAY_MODEL_LLAMA, DISPLAY_MODEL_GRANITE, DISPLAY_MODEL_FLAN])
 
 
-print("Anish: " + os.environ["api_key"])
+if selected_model == DISPLAY_MODEL_LLAMA:
+    globals()["selected_use_case_model"] = LLAMA_2_70B_CHAT
+elif selected_model == DISPLAY_MODEL_GRANITE:
+    globals()["selected_use_case_model"] = GRANITE_13B_CHAT
+elif selected_model == DISPLAY_MODEL_ELYZA:
+    globals()["selected_use_case_model"] = ELYZA
+else:
+    # Default model if there is no selection
+    globals()["selected_use_case_model"] = FLAN_UL2
 
-if __name__ == "__main__":
-    main()
+# For debugging
+print("Selected model: " + selected_use_case_model)
+
+selected_option = st.sidebar.selectbox("Select Option", [OPTION_SUMMARY,OPTION_EXTRACT,OPTION_ANALYZE])
+
+if selected_option == OPTION_SUMMARY:
+    demo_summary()
+elif selected_option == OPTION_EXTRACT:
+    demo_extract()
+elif selected_option == OPTION_ANALYZE:
+    demo_analyze()
+
+
+
