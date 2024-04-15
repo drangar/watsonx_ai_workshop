@@ -114,7 +114,7 @@ def demo_summary():
         default_review = re.sub(r'\s+', ' ', default_review_no_return)
 
     with col2:
-        review = st.text_area('Review',value=default_review, height=300)
+        review = st.text_area('Review',value=default_review, height=300, key="txt"+str(random.randint(1, 100)))
         get_summary_clicked = st.button("Summarize", key="but"+str(random.randint(1222, 9900)))
 
     st.subheader("Results")
@@ -157,7 +157,7 @@ def demo_extract():
         default_review = re.sub(r'\s+', ' ', default_review_no_return)
 
     with col2:
-        review = st.text_area('Review',value=default_review, height=300)
+        review = st.text_area('Review',value=default_review, height=300, key="txt"+str(random.randint(1111, 1300)))
         extract_info_clicked = st.button("Extract", key="but"+str(random.randint(1, 10000))))
 
     st.subheader("Results")
